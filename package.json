@@ -1,0 +1,21 @@
+{
+    "name": "SpaceMadness",
+    "author": "JuanMa Aguero",
+    "version": "0.0.6",
+    "description": "HTML5 space game",
+    "node": "0.8.14",
+    "dependencies": {
+        "express": "3.x",
+        "socket.io": "= 0.9.16",
+        "ejs": "= 0.8.4",
+        "mongoose": "= 3.6.15",
+        "node-native-zip": "=1.1.0"
+    },
+    "subdomain": "spacemadness",
+    "scripts": {
+        "start": "index.js"
+    },
+    "engines": {
+        "node": "0.8.14"
+    }
+}

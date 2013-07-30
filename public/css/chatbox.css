@@ -1,0 +1,57 @@
+/* 
+    Document   : chatbox
+    Created on : Jul 24, 2013, 5:54:16 PM
+    Author     : JMA <jaguero@flowcode.com.ar>
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+root { 
+    display: block;
+}
+
+#chatbox{
+    position: fixed;
+    bottom: 0px;
+    z-index: 30;
+    width: 300px;
+    background-color: #33485D;
+    padding: 10px;
+    border-radius: 8px 8px 0px 0px;
+    right: 5px;
+    height: 15px;
+    font-size: 0.9rem;
+}
+#chatbox.active{
+    height: 168px;
+}
+#chatbox #chatroom{
+    display: none;
+    background-color: white;
+    height: 100px;
+    overflow-y: auto;
+    border-radius: 5px;
+    margin-bottom: 2px;
+}
+#chatbox #controls{
+    display: none;
+}
+#chatbox #tell-me-username{
+    
+}
+#chatbox #chatmsg{
+    height: 30px;
+    width: 95%;
+    margin-bottom: 2px;
+}
+#chatbox #chatheader{
+    line-height: 20px;
+    margin-bottom: 5px;
+}
+#chatbox #chatheader > span{
+    color: white;
+}
+#chatbox #chatheader > a{
+    text-decoration: none;
+    cursor: pointer;
+}

@@ -21,7 +21,7 @@ function joinGame() {
     $("#connectingText").show();
     $("#connectingLoader").show();
     socket = io.connect();
-    game.setup();
+    game.setup(socket);
 
     socket.on('connect', function() {
         if (!username.length > 0) {
@@ -45,6 +45,7 @@ function joinGame() {
 
     socket.on('updateObjects', function(data) {
         game.objects = data.objects;
+        game.correctObjects();
     });
 
     socket.on('initWorld', function(data) {
@@ -111,7 +112,10 @@ function addPoints() {
 
 $(document).keydown(function(e) {
     if (game.status == 'running') {
-        socket.emit('appendEvent', {type: 'keyboard', player: username, value: game.sampleUserInput(e.keyCode), status: 'active'});
+        var value = game.sampleUserInput(e.keyCode);
+        if (value) {
+            game.handleInput({type: 'keyboard', player: username, value: value, status: 'active'});
+        }
     }
 });
 

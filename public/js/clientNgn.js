@@ -7,7 +7,11 @@ function clientNgn() {
     this.ctx = undefined;
     this.intLoop = null;
     this.objects = [];
+    this.userInputs = [];
     this.status = 'dead';
+    this.socket;
+    this.worldWidth = 708;
+    this.worldHeight = 507;
 }
 
 clientNgn.prototype.renderWorld = function() {
@@ -39,7 +43,15 @@ clientNgn.prototype.sampleUserInput = function(keyCode) {
         case keymapArrows.shoot:
             return "shoot";
             break;
+        default:
+            return false;
+            break;
     }
+}
+
+clientNgn.prototype.handleInput = function(input) {
+    this.userInputs.push(input);
+    this.socket.emit('appendEvent', input);
 }
 
 /*
@@ -74,9 +86,10 @@ clientNgn.prototype.clearCanvas = function() {
 /*
  * Setup ngn
  */
-clientNgn.prototype.setup = function(canvasDOMelement) {
+clientNgn.prototype.setup = function(socket) {
     this.canvas = document.getElementById("canvas-layer");
     this.ctx = this.canvas.getContext("2d");
+    this.socket = socket;
 }
 
 clientNgn.prototype.run = function() {
@@ -84,16 +97,69 @@ clientNgn.prototype.run = function() {
 
     function loop() {
         setTimeout(function() {
+            clientNgnObj.makePredictions();
             clientNgnObj.renderWorld();
-        }, 1200);
+            clientNgnObj.clean();
+        }, 1500);
     }
     this.stop();
     this.intLoop = setInterval(loop, 60);
 }
+
+clientNgn.prototype.makePredictions = function() {
+    for (var j = 0; j < this.objects.length; j++) {
+        for (var i = 0; i < this.userInputs.length; i++) {
+
+            // shoot
+            if (this.objects[j].player == this.userInputs[i].player
+                    && this.userInputs[i].status == 'active'
+                    && this.objects[j].name == "ship"
+                    && this.userInputs[i].type == "keyboard"
+                    && this.userInputs[i].value == "shoot") {
+                this.objects.push(new shoot({player: this.userInputs[i].player, vel: 10, posX: this.objects[j].posX, posY: this.objects[j].posY}));
+                this.userInputs[i].status = 'inactive';
+            }
+            this.objects[j].notify(this.userInputs[i]);
+        }
+        this.objects[j].update();
+    }
+}
+
+
 
 /*
  * Stop Ngn
  */
 clientNgn.prototype.stop = function() {
     clearInterval(this.intLoop);
+}
+
+clientNgn.prototype.correctObjects = function() {
+    for (var j = 0; j < this.objects.length; j++) {
+        if (this.objects[j].name === 'ship') {
+            this.objects[j] = new ship({player: this.objects[j].player, posX: this.objects[j].posX, posY: this.objects[j].posY});
+        }
+        if(this.objects[j].name === 'shoot'){
+            this.objects[j] = new shoot({player: this.objects[j].player, vel: 10, posX: this.objects[j].posX, posY: this.objects[j].posY});
+        }
+    }
+}
+
+clientNgn.prototype.clean = function() {
+
+    // clean objects that are out of bounds
+    for (var j = 0; j < this.objects.length; j++) {
+        if (this.objects[j].posX > this.worldWidth
+                || this.objects[j].posY > this.worldHeight + 100
+                || this.objects[j].posX < -50
+                || this.objects[j].posY < -50)
+            this.objects.splice(j, 1);
+    }
+
+    // clean events
+    for (var i = 0; i < this.userInputs.length; i++) {
+        if (this.userInputs[i].status === 'inactive') {
+            this.userInputs.splice(i, 1);
+        }
+    }
 }

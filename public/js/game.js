@@ -116,11 +116,7 @@ game.prototype.update = function() {
 
     for (var i = 0; i < this.eventQueue.length; i++) {
         if (this.eventQueue[i].type === 'newShip') {
-            this.objects.push(new ship({
-                player: this.eventQueue[i].player,
-                posX: this.eventQueue[i].value.posX,
-                posY: this.eventQueue[i].value.posY,
-            }));
+            this.objects.push(new ship(this.eventQueue[i].value));
             this.eventQueue[i].status = 'inactive';
         }
         if (this.eventQueue[i].type === 'newRock') {

@@ -26,7 +26,6 @@ root {
     height: 168px;
 }
 #chatbox #chatroom{
-    display: none;
     background-color: white;
     height: 100px;
     overflow-y: auto;
@@ -34,7 +33,6 @@ root {
     margin-bottom: 2px;
 }
 #chatbox #controls{
-    display: none;
 }
 #chatbox #tell-me-username{
     

@@ -33,13 +33,31 @@
 }
 
 #loading-layer {
-    background-color: gray;
+    background-color: black;
     width: 708px;
     height: 570px;
     position: absolute;
     z-index:4;
-    left: 0;
-    top: 0;
+    left: 25px;
+    top: 25px;
+}
+#connecting-layer{
+    background-color: black;
+    width: 708px;
+    height: 570px;
+    position: absolute;
+    z-index:6;
+    left: 24px;
+    top: 24px;
+}
+#connectBtn{
+    margin: 233px 100px 10px 300px;
+}
+#connectingText{
+    margin-top: 233px;
+}
+#serverControl{
+    display: none;
 }
 
 .header-layer{

@@ -109,39 +109,6 @@ ship.prototype.update = function(ctx) {
 }
 
 
-/*
- * Filter event
- */
-ship.prototype.notify = function(e) {
-    switch (e.keyCode) {
-        case this.keymap.left:
-            this.activeDirection = "left";
-            break;
-        case this.keymap.up:
-            this.activeDirection = "up";
-            break;
-        case this.keymap.right:
-            this.activeDirection = "right";
-            break;
-        case this.keymap.down:
-            this.activeDirection = "down";
-            break;
-        case this.keymap.shoot:
-            var lazer = new Audio("./sounds/laser.ogg");
-            lazer.play();
-            var nShoot = [];
-            nShoot[0] = this.posX + 10;
-            nShoot[1] = this.posY + 10;
-            this.shoots.push(nShoot);
-            this.isShooting = true;
-            break;
-    }
-
-
-
-}
-
-
 ship.prototype.drawShoots = function(ctx) {
 
     for (i = 0; i < this.shoots.length; i++) {

@@ -1,4 +1,4 @@
-var gameInstance = new game();
+var clientNgn = new clientNgn();
 var gameRunning = false;
 var gamePaused = false;
 var points = 0;
@@ -36,8 +36,7 @@ socket.on('clientOffline', function(data) {
 });
 
 socket.on('initSlider', function(data) {
-    updatePlayers(data.players);
-    socketIOReady.resolve(data);
+
 });
 
 socket.on('startGame', function(data) {
@@ -45,8 +44,8 @@ socket.on('startGame', function(data) {
     startGame();
 });
 
-socket.on('appendEvent', function(data) {
-    gameInstance.eventQueue.push(data);
+socket.on('updateObjects', function(data) {
+    clientNgn.eventQueue.push(data);
 });
 
 socket.on('message', function(data) {
@@ -147,9 +146,8 @@ function updatePointsBoard(points) {
 }
 
 $(document).keydown(function(e) {
-    if (gameRunning) {
-        gameInstance.eventQueue.push({type: 'keyboard', player: username, value: e.keyCode, status: 'active'});
-        socket.emit('appendEvent', {type: 'keyboard', player: username, value: e.keyCode, status: 'active'});
+    if (clientNgn.state === 'running') {
+        socket.emit('appendEvent', {type: 'keyboard', player: username, value: clientNgn.sampleUserInput(e.keyCode), status: 'active'});
     }
 });
 
@@ -157,31 +155,32 @@ var keymapArrows = {left: 37, up: 38, right: 39, down: 40, shoot: 70};
 var keymapAsd = {left: 65, up: 87, right: 68, down: 83, shoot: 70};
 
 function startGame() {
-    if (!gameRunning) {
+    if (!clientNgn.state === 'running') {
         $('#space').pan({fps: 30, speed: 3, dir: 'down', depth: 10});
-        gameRunning = true;
+        clientNgn.state = 'running';
 
-        gameInstance.objects.push(new ship({
+        // my ship
+        var paramsShip = {
             player: username,
             keymap: keymapArrows,
             posX: 200,
             posY: 200,
-            events: gameInstance.eventQueue
-        }));
-        socket.emit('appendEvent', {type: 'newShip', player: username, value: {posX: 200, posY: 200}, status: 'active'});
+            events: clientNgn.eventQueue
+        }
+        clientNgn.objects.push(new ship(paramsShip));
+        
+        // tell others about me
+        socket.emit('appendEvent', {type: 'newShip', player: username, value: paramsShip, status: 'active'});
 
-        var randomVel = (2 + (Math.random() * (5 - 2)));
-        var randomPosX = (2 + (0 + (Math.random() * (700 - 20))));
-        gameInstance.objects.push(new rock({vel: randomVel, posX: randomPosX}));
-        socket.emit('appendEvent', {type: 'newRock', player: username, value: {vel: randomVel, posX: randomPosX}, status: 'active'});
-
-        //gameInstance.objects.push(new rock());
-
-        gameInstance.init();
+//        var randomVel = (2 + (Math.random() * (5 - 2)));
+//        var randomPosX = (2 + (0 + (Math.random() * (700 - 20))));
+//        clientNgn.objects.push(new rock({vel: randomVel, posX: randomPosX}));
+//        socket.emit('appendEvent', {type: 'newRock', player: username, value: {vel: randomVel, posX: randomPosX}, status: 'active'});
+        clienNgn.run();
         socket.emit('startGame', {gameStatus: 'running'});
     } else {
         $('#space').spStart();
-        gameInstance.startLoop();
+        clientNgn.run();
     }
     soundBuffer['backMusic'].play();
 }
@@ -189,7 +188,7 @@ function startGame() {
 function pauseGame() {
     soundBuffer['backMusic'].pause();
     $('#space').spStop();
-    gameInstance.stop();
+    clientNgn.stop();
 }
 
 function gameOver() {
@@ -268,9 +267,6 @@ $(document).ready(function() {
         if ($("#chatbox").hasClass("active")) {
             $("#chatbox").removeClass("active");
         } else {
-            if (username.length === 0) {
-
-            }
             $("#chatbox").addClass("active");
             $("#newmsg").removeClass("icon-white");
         }

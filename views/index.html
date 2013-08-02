@@ -9,27 +9,25 @@
         <link type="text/css" href="css/bootstrap-responsive.min.css" rel="stylesheet">
         <link type="text/css" href="css/bootstrap.min.css" rel="stylesheet" />
         <link type="text/css" href="css/space-madness.css" rel="stylesheet" />
-        <link type="text/css" href="css/chatbox.css" rel="stylesheet" />
+        <!--<link type="text/css" href="css/chatbox.css" rel="stylesheet" />-->
 
         <script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
         <script type="text/javascript" src="js/jquery-ui-1.8.13.custom.min.js"></script>
         <script type="text/javascript" src="js/jquery.spritely-0.5.js"></script>
-        <script type="text/javascript" src="js/game.js"></script>
         <script type="text/javascript" src="js/ship.js"></script>
         <script type="text/javascript" src="js/rock.js"></script>
 
-        <script src="http://localhost:3500/socket.io/socket.io.js"></script>
-        <script type="text/javascript" src="js/spacemadness.js"></script>
-        <script type="text/javascript" src="js/publicController.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="js/clientNgn.js"></script>
+        <script type="text/javascript" src="js/sm-reloaded.js"></script>
     </head>
     <body>
         <div class="navbar">
             <div class="navbar-inner">
                 <a class="brand" href="#">Space Madness</a>
                 <ul class="nav">
-                    <li><a href="#" onclick="startGame();">start</a></li>
-                    <li><a href="#" onclick="pauseGame();">pause</a></li>
-                    <li><a href="ranking">ranking</a></li>
+                    <li><a href="#" >rooms</a></li>
+                    <li><a href="#">ranking</a></li>
                 </ul>
             </div>
         </div>
@@ -44,17 +42,23 @@
                             <span style="position: absolute; top: 250px; color: white; width: 708; left: 0;">Loading...</span>
                             <div id="progress-bar" style="left: 100; top: 300; position: absolute; width: 70%; z-index: 8;"></div>
                         </div>
+                        <div id="connecting-layer">
+                            <button id="connectBtn" type="button" class="btn btn-primary btn-large" onclick="joinGame()"><i class="icon-globe icon-white"></i> join room</button>
+                            <div id="connectingText" style="text-align: center;color: white;display: none;">Connecting...</div>
+                            <div id="connectingLoader" style="text-align: center;color: white;display: none;"><img src="images/ajax-loader.gif"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="span2">
-                    <div class="well well-small">
-                        <button class="btn btn-large btn-block btn-primary" type="button" onclick="startGame();">Start</button>
-                        <button class="btn btn-large btn-block" type="button" onclick="pauseGame();">Pause</button>
-                        <button class="btn btn-large btn-block" type="button" onclick="startGame();">Refresh</button>
-                    </div>
-                    <div class="well well-small">
-                        <div id="players">
-                            <div><span>player</span>:<span>player</span></div>
+                    <div id="serverControl">
+                        <div class="well well-small">
+                            <button class="btn btn-large btn-block btn-primary" type="button" onclick="startGame();" title="Play!" ><i class="icon-play"></i></button>
+                            <button class="btn btn-large btn-block" type="button" onclick="pauseGame();" title="pause"><i class="icon-pause"></i></button>
+                        </div>
+                        <div class="well well-small">
+                            <div id="players">
+                                <div><span>player</span>:<span>player</span></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -76,20 +80,17 @@
                     <span class="pull-right">2011</span>
                 </div>
             </div>
-            <div id="chatbox">
-                <div id="chatheader">
-                    <span>Chatroom</span>
-                    <i class="icon-comment" id="newmsg"></i>
-                    <a class="link pull-right"><i class="icon-minus icon-white"></i></a>
-                </div>
-                <div id="chatroom"></div>
-                <div id="tell-me-username">
-                    <input id="username" type="text" placeholder="Who are you?">
-                    <button id="setusername" class="btn btn-success">Ready</button></div>
-                <div id="controls">
-                    <textarea id="chatmsg"></textarea>
-                </div>
-            </div>	
+            <!--            <div id="chatbox">
+                            <div id="chatheader">
+                                <span>Chatroom</span>
+                                <i class="icon-comment" id="newmsg"></i>
+                                <a class="link pull-right"><i class="icon-minus icon-white"></i></a>
+                            </div>
+                            <div id="chatroom"></div>
+                            <div id="controls">
+                                <textarea id="chatmsg"></textarea>
+                            </div>
+                        </div>	-->
         </div>
     </body>
 </html>

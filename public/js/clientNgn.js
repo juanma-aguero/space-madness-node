@@ -2,7 +2,7 @@
  * Client Ngn instance.
  *
  */
-function clientNgn() {
+function clientNgn(params) {
     this.canvas = undefined;
     this.ctx = undefined;
     this.intLoop = null;
@@ -12,6 +12,7 @@ function clientNgn() {
     this.socket;
     this.worldWidth = 708;
     this.worldHeight = 507;
+    this.withPrediction = (params.prediction ? params.prediction : false);
 }
 
 clientNgn.prototype.renderWorld = function() {
@@ -50,7 +51,9 @@ clientNgn.prototype.sampleUserInput = function(keyCode) {
 }
 
 clientNgn.prototype.handleInput = function(input) {
-    this.userInputs.push(input);
+    if (this.withPrediction) {
+        this.userInputs.push(input);
+    }
     this.socket.emit('appendEvent', input);
 }
 
@@ -97,10 +100,14 @@ clientNgn.prototype.run = function() {
 
     function loop() {
         setTimeout(function() {
-            clientNgnObj.makePredictions();
-            clientNgnObj.renderWorld();
-            clientNgnObj.clean();
-        }, 1500);
+            if (this.withPrediction) {
+                clientNgnObj.makePredictions();
+                clientNgnObj.renderWorld();
+                clientNgnObj.clean();
+            } else {
+                clientNgnObj.renderWorld();
+            }
+        }, 200);
     }
     this.stop();
     this.intLoop = setInterval(loop, 60);
@@ -139,7 +146,7 @@ clientNgn.prototype.correctObjects = function() {
         if (this.objects[j].name === 'ship') {
             this.objects[j] = new ship({player: this.objects[j].player, posX: this.objects[j].posX, posY: this.objects[j].posY});
         }
-        if(this.objects[j].name === 'shoot'){
+        if (this.objects[j].name === 'shoot') {
             this.objects[j] = new shoot({player: this.objects[j].player, vel: 10, posX: this.objects[j].posX, posY: this.objects[j].posY});
         }
     }

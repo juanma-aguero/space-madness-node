@@ -1,3 +1,4 @@
+
 /** shoot*/
 function shoot(params) {
     this.name = 'shoot';
@@ -25,6 +26,6 @@ shoot.prototype.update = function() {
 }
 
 shoot.prototype.notify = function(e) {
-    
+
 }
 

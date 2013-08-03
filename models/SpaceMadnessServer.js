@@ -2,124 +2,119 @@ var shipModule = require("./ship");
 var rockModule = require("./rock");
 var shootModule = require("./shoot");
 
-var intLoop = null;
-var objects = [];
-var players = [];
-var eventQueue = [];
-var running = false;
-var worldWidth = 708;
-var worldHeight = 507;
 
-function stopLoop() {
-    clearInterval(intLoop);
+/**
+ * SpaceMadness Game Server
+ */
+function SpaceMadnessServer(params) {
+    this.intLoop = null;
+    this.objects = [];
+    this.players = [];
+    this.eventQueue = [];
+    this.running = false;
+    this.worldWidth = 708;
+    this.worldHeight = 507;
 }
-function startLoop(broadcastCallback) {
+module.exports.SpaceMadnessServer = SpaceMadnessServer;
 
+SpaceMadnessServer.prototype.stopLoop = function() {
+    clearInterval(this.intLoop);
+}
+SpaceMadnessServer.prototype.startLoop = function(broadcastCallback) {
+    var serverInstance = this;
     function loop() {
 
         // update objects
-        update();
-
+        serverInstance.update();
         // broadcast updates
         broadcastCallback();
-
         // clean events
-        clean();
+        serverInstance.clean();
     }
 
-    stopLoop();
-
-    intLoop = setInterval(loop, 30);
+    this.stopLoop();
+    this.intLoop = setInterval(loop, 30);
 }
 
 /*
  * Init SpaceMadness Server
  */
-exports.run = function(broadcastCallback) {
-    if (!running) {
-        running = true;
+SpaceMadnessServer.prototype.run = function(broadcastCallback) {
+    if (!this.running) {
+        this.running = true;
     }
-    startLoop(broadcastCallback);
+    this.startLoop(broadcastCallback);
 }
 
-exports.addPlayer = function(params) {
+SpaceMadnessServer.prototype.addPlayer = function(params) {
     var newShip = new shipModule.ship({player: params.player, posX: 200, posY: 200});
-    objects.push(newShip);
+    this.objects.push(newShip);
 }
 
-exports.getObjects = function() {
-    return objects;
+SpaceMadnessServer.prototype.getObjects = function() {
+    return this.objects;
 }
 
-exports.cleanPlayer = function(player) {
-    for (var j = 0; j < objects.length; j++) {
-        if (objects[j].player == player) {
-            objects.splice(j, 1);
+SpaceMadnessServer.prototype.cleanPlayer = function(player) {
+    for (var j = 0; j < this.objects.length; j++) {
+        if (this.objects[j].player == player) {
+            this.objects.splice(j, 1);
         }
     }
 }
 
-exports.appendEvent = function(e) {
-    eventQueue.push(e);
+SpaceMadnessServer.prototype.appendEvent = function(e) {
+    this.eventQueue.push(e);
 }
 
 
 /*
  * Stop SpaceMadness
  */
-exports.stop = function() {
-    stopLoop();
-    running = false;
+SpaceMadnessServer.prototype.stop = function() {
+    this.stopLoop();
+    this.running = false;
 }
 
 /*
  * Update all components
  */
-function update() {
+SpaceMadnessServer.prototype.update = function() {
 
-    for (var j = 0; j < objects.length; j++) {
-        for (var i = 0; i < eventQueue.length; i++) {
+    for (var j = 0; j < this.objects.length; j++) {
+        for (var i = 0; i < this.eventQueue.length; i++) {
 
             // shoot
-            if (objects[j].player == eventQueue[i].player
-                    && eventQueue[i].status == 'active'
-                    && objects[j].name == "ship"
-                    && eventQueue[i].type == "keyboard"
-                    && eventQueue[i].value == "shoot") {
-                objects.push(new shootModule.shoot({player: eventQueue[i].player, vel: 10, posX: objects[j].posX, posY: objects[j].posY}));
-                eventQueue[i].status = 'inactive';
+            if (this.objects[j].player == this.eventQueue[i].player
+                    && this.eventQueue[i].status == 'active'
+                    && this.objects[j].name == "ship"
+                    && this.eventQueue[i].type == "keyboard"
+                    && this.eventQueue[i].value == "shoot") {
+                this.objects.push(new shootModule.shoot({player: this.eventQueue[i].player, vel: 10, posX: this.objects[j].posX, posY: this.objects[j].posY}));
+                this.eventQueue[i].status = 'inactive';
             }
 
-            objects[j].notify(eventQueue[i]);
+            this.objects[j].notify(this.eventQueue[i]);
         }
-        objects[j].update();
+        this.objects[j].update();
     }
 
 }
-function clean() {
+SpaceMadnessServer.prototype.clean = function() {
 
-    // clean objects that are out of bounds
-    for (var j = 0; j < objects.length; j++) {
-        if (objects[j].posX > worldWidth
-                || objects[j].posY > worldHeight + 100
-                || objects[j].posX < -50
-                || objects[j].posY < -50)
-            objects.splice(j, 1);
+// clean objects that are out of bounds
+    for (var j = 0; j < this.objects.length; j++) {
+        if (this.objects[j].posX > this.worldWidth
+                || this.objects[j].posY > this.worldHeight + 100
+                || this.objects[j].posX < -50
+                || this.objects[j].posY < -50)
+            this.objects.splice(j, 1);
     }
 
-    // clean events
-    for (var i = 0; i < eventQueue.length; i++) {
-        if (eventQueue[i].status === 'inactive') {
-            eventQueue.splice(i, 1);
+// clean events
+    for (var i = 0; i < this.eventQueue.length; i++) {
+        if (this.eventQueue[i].status === 'inactive') {
+            this.eventQueue.splice(i, 1);
         }
     }
 }
-//exports.generateRocks = function() {
-//    var count = (1 + (Math.random() * (2 - 1)));
-//    for (var i = 0; i < count; i++) {
-//        var randomVel = (2 + (Math.random() * (5 - 2)));
-//        var randomPosX = (2 + (0 + (Math.random() * (700 - 20))));
-//        objects.push(new rock({vel: randomVel, posX: randomPosX}));
-//        socket.emit('appendEvent', {type: 'newRock', player: username, value: {vel: randomVel, posX: randomPosX}, status: 'active'});
-//    }
-//}

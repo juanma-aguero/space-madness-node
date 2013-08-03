@@ -16,7 +16,7 @@ function updatePlayers(players) {
 
 
 function joinGame() {
-    game = new clientNgn();
+    game = new clientNgn({prediction: false});
     $("#connectBtn").hide();
     $("#connectingText").show();
     $("#connectingLoader").show();

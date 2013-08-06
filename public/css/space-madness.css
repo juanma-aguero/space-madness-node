@@ -50,11 +50,12 @@
     left: 24px;
     top: 24px;
 }
+#player{
+}
 #connectBtn{
-    margin: 233px 100px 10px 300px;
 }
 #connectingText{
-    margin-top: 233px;
+    margin-top: 20px;
 }
 #serverControl{
     display: none;

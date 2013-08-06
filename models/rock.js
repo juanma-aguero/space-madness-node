@@ -14,6 +14,7 @@ function rock(params) {
     this.clock = 0;
 }
 
+module.exports.rock = rock;
 
 /*
  * Update rock state
@@ -21,49 +22,44 @@ function rock(params) {
 rock.prototype.update = function(objects) {
 
     for (var j = 0; j < objects.length; j++) {
-        if (objects[j].name == 'ship') {
-            var ship = objects[j];
-            // Ship hits management
-            if (((ship.posX >= this.posX && ship.posX <= (this.posX + this.width)) ||
-                    (ship.posX + ship.width >= this.posX && ship.posX.width <= (this.posX + this.width))) &&
-                    ship.posY >= this.posY && ship.posY <= this.posY + this.height && ship.state == 0) {
-                ship.state = 2;
-                var explosion = new Audio("./sounds/bigboom.wav");
-                explosion.play();
-            }
-
-            // Shoot hits management
-            if (this.state == 0) {
-                for (var i = 0; i < ship.shoots.length; i++) {
-                    if (ship.shoots[i][0] >= this.posX &&
-                            ship.shoots[i][0] <= (this.posX + this.width) &&
-                            ship.shoots[i][1] >= this.posY &&
-                            ship.shoots[i][1] <= this.posY + this.height
-                            ) {
-                        ship.clearShoot(ship.shoots[i][0], ship.shoots[i][1]);
-                        ship.shoots.splice(i, 1);
-                        this.state = 1;
-                        this.clock = 0;
-                        this.img = 'rock-explosion';
-                        var explosion = new Audio("./sounds/explosion.wav");
-                        explosion.play();
-                        addPoints();
-                    }
-
+        var currentObj = objects[j];
+        switch (currentObj.name) {
+            case 'ship':
+                var ship = objects[j];
+                // Ship hits management
+                if (((currentObj.posX >= this.posX && currentObj.posX <= (this.posX + this.width)) ||
+                        (currentObj.posX + currentObj.width >= this.posX && currentObj.posX.width <= (this.posX + this.width))) &&
+                        currentObj.posY >= this.posY && currentObj.posY <= this.posY + this.height && currentObj.status == 0) {
+                    currentObj.status = 2;
                 }
-            }
+                break;
+            case 'shoot':
+                // Shoot hits management
+                if (this.state == 0 && currentObj.posX >= this.posX &&
+                        currentObj.posX <= (this.posX + this.width) &&
+                        currentObj.posY >= this.posY &&
+                        currentObj.posY <= this.posY + this.height
+                        ) {
+                    objects.splice(j, 1);
+                    this.state = 1;
+                    this.clock = 0;
+                    this.img = 'rock-explosion';
+                }
+                break;
+
         }
+
     }
 
 
 
     // Explotion management
-    if (this.state == 1 && this.clock > (imageBuffer[this.img].width / this.width) * 2 - 2) {
+    if (this.state == 1 && this.clock > (1024 / this.width) * 2 - 2) {
         this.state = 2;
     }
 
     // Position management
-    if (this.posY > context.height) {
+    if (this.posY > 507) {
         this.state = 3;
     } else {
         this.posY = this.posY + this.vel;
@@ -74,13 +70,15 @@ rock.prototype.update = function(objects) {
         this.spriteX = this.width * (this.clock / 2);
         this.spriteY = 0;
     }
-    if (this.clock > (imageBuffer[this.img].width / this.width) * 2 - 2) {
+    if (this.clock > (1024 / this.width) * 2 - 2) {
         this.clock = 0;
     }
     this.clock++;
 
-
 }
 
+rock.prototype.notify = function(e) {
+
+}
 
 

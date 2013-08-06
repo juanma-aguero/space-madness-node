@@ -2,7 +2,7 @@
 function ship(params) {
     this.name = 'ship';
     this.player = params.player;
-    this.vel = 6;
+    this.vel = 4;
     this.gameEventQueue = params.events;
     this.keymap = (params.keymap ? params.keymap : undefined);
     this.posX = (params.posX ? params.posX : 200);

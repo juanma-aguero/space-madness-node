@@ -107,7 +107,7 @@ clientNgn.prototype.run = function() {
             } else {
                 clientNgnObj.renderWorld();
             }
-        }, 200);
+        }, 600);
     }
     this.stop();
     this.intLoop = setInterval(loop, 60);

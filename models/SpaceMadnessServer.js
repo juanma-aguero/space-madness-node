@@ -12,6 +12,7 @@ function SpaceMadnessServer(params) {
     this.players = [];
     this.eventQueue = [];
     this.running = false;
+    this.gameStarted = false;
     this.worldWidth = 708;
     this.worldHeight = 507;
 }
@@ -33,7 +34,7 @@ SpaceMadnessServer.prototype.startLoop = function(broadcastCallback) {
     }
 
     this.stopLoop();
-    this.intLoop = setInterval(loop, 30);
+    this.intLoop = setInterval(loop, 40);
 }
 
 /*
@@ -43,7 +44,21 @@ SpaceMadnessServer.prototype.run = function(broadcastCallback) {
     if (!this.running) {
         this.running = true;
     }
+    if (!this.gameStarted) {
+        var randomVel = (2 + (Math.random() * (5 - 2)));
+        var randomPosX = (2 + (0 + (Math.random() * (700 - 20))));
+        this.objects.push(new rockModule.rock({vel: randomVel, posX: randomPosX}));
+        this.gameStarted = true;
+    }
     this.startLoop(broadcastCallback);
+}
+
+/*
+ * Stop SpaceMadness
+ */
+SpaceMadnessServer.prototype.stop = function() {
+    this.stopLoop();
+    this.running = false;
 }
 
 SpaceMadnessServer.prototype.addPlayer = function(params) {
@@ -68,13 +83,7 @@ SpaceMadnessServer.prototype.appendEvent = function(e) {
 }
 
 
-/*
- * Stop SpaceMadness
- */
-SpaceMadnessServer.prototype.stop = function() {
-    this.stopLoop();
-    this.running = false;
-}
+
 
 /*
  * Update all components
@@ -82,32 +91,72 @@ SpaceMadnessServer.prototype.stop = function() {
 SpaceMadnessServer.prototype.update = function() {
 
     for (var j = 0; j < this.objects.length; j++) {
+        var currentObj = this.objects[j];
         for (var i = 0; i < this.eventQueue.length; i++) {
 
             // shoot
-            if (this.objects[j].player == this.eventQueue[i].player
+            if (currentObj.player == this.eventQueue[i].player
                     && this.eventQueue[i].status == 'active'
-                    && this.objects[j].name == "ship"
+                    && currentObj.name == "ship"
                     && this.eventQueue[i].type == "keyboard"
                     && this.eventQueue[i].value == "shoot") {
-                this.objects.push(new shootModule.shoot({player: this.eventQueue[i].player, vel: 10, posX: this.objects[j].posX, posY: this.objects[j].posY}));
+                this.objects.push(new shootModule.shoot({player: this.eventQueue[i].player, vel: 10, posX: currentObj.posX, posY: currentObj.posY}));
                 this.eventQueue[i].status = 'inactive';
             }
 
-            this.objects[j].notify(this.eventQueue[i]);
+            currentObj.notify(this.eventQueue[i]);
         }
-        this.objects[j].update();
+        switch (currentObj.name) {
+            case 'rock':
+                if (currentObj.state <= 1) {
+                    currentObj.update(this.objects);
+                }
+                if (currentObj.state == 2) {
+                    this.objects.splice(j, 1);
+                    var randomVel = (2 + (Math.random() * (5 - 2)));
+                    var randomPosX = (2 + (0 + (Math.random() * (700 - 20))));
+                    this.objects.push(new rockModule.rock({vel: randomVel, posX: randomPosX}));
+                }
+                if (currentObj.state == 3) {
+                    this.objects.splice(j, 1);
+                    this.generateRocks();
+                }
+                break;
+            case 'ship':
+                if (currentObj.status <= 8) {
+                    currentObj.update();
+                } else {
+                    this.stop();
+                    //gameOver();
+                }
+                break;
+            case 'shoot':
+                currentObj.update();
+                break;
+        }
+
     }
 
 }
+
+SpaceMadnessServer.prototype.generateRocks = function() {
+    var count = (1 + (Math.random() * (2 - 1)));
+    for (var i = 0; i < count; i++) {
+        var randomVel = (2 + (Math.random() * (5 - 2)));
+        var randomPosX = (2 + (0 + (Math.random() * (700 - 20))));
+        this.objects.push(new rockModule.rock({vel: randomVel, posX: randomPosX}));
+    }
+}
+
 SpaceMadnessServer.prototype.clean = function() {
 
 // clean objects that are out of bounds
     for (var j = 0; j < this.objects.length; j++) {
-        if (this.objects[j].posX > this.worldWidth
-                || this.objects[j].posY > this.worldHeight + 100
-                || this.objects[j].posX < -50
-                || this.objects[j].posY < -50)
+        var currentObj = this.objects[j];
+        if (currentObj.posX > this.worldWidth
+                || currentObj.posY > this.worldHeight + 100
+                || currentObj.posX < -50
+                || currentObj.posY < -50)
             this.objects.splice(j, 1);
     }
 

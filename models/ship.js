@@ -2,7 +2,7 @@
 function ship(params) {
     this.name = 'ship';
     this.player = params.player;
-    this.vel = 3;
+    this.vel = 4;
     this.posX = (params.posX ? params.posX : 200);
     this.posY = (params.posY ? params.posY : 200);
     this.spriteX = 0;

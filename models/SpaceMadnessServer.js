@@ -34,7 +34,7 @@ SpaceMadnessServer.prototype.startLoop = function(broadcastCallback) {
     }
 
     this.stopLoop();
-    this.intLoop = setInterval(loop, 40);
+    this.intLoop = setInterval(loop, 50);
 }
 
 /*
@@ -62,8 +62,13 @@ SpaceMadnessServer.prototype.stop = function() {
 }
 
 SpaceMadnessServer.prototype.addPlayer = function(params) {
+    this.players.push({player: params.player, points: 0});
     var newShip = new shipModule.ship({player: params.player, posX: 200, posY: 200});
     this.objects.push(newShip);
+}
+
+SpaceMadnessServer.prototype.getPlayers = function() {
+    return this.players;
 }
 
 SpaceMadnessServer.prototype.getObjects = function() {
@@ -74,6 +79,11 @@ SpaceMadnessServer.prototype.cleanPlayer = function(player) {
     for (var j = 0; j < this.objects.length; j++) {
         if (this.objects[j].player == player) {
             this.objects.splice(j, 1);
+        }
+    }
+    for (var i = 0; i < this.players.length; i++) {
+        if (this.players[i].player == player) {
+            this.players.splice(i, 1);
         }
     }
 }
@@ -112,6 +122,13 @@ SpaceMadnessServer.prototype.update = function() {
                     currentObj.update(this.objects);
                 }
                 if (currentObj.state == 2) {
+                    if (currentObj.player !== "undefined") {
+                        for (var x = 0; x < this.players.length; x++) {
+                            if (currentObj.player == this.players[x].player) {
+                                this.players[x].points += 10;
+                            }
+                        }
+                    }
                     this.objects.splice(j, 1);
                     var randomVel = (2 + (Math.random() * (5 - 2)));
                     var randomPosX = (2 + (0 + (Math.random() * (700 - 20))));

@@ -1,6 +1,7 @@
 /** Rect*/
 function rock(params) {
     this.name = 'rock';
+    this.player = undefined;
     this.vel = params.vel;
     this.posX = params.posX;
     this.spriteX = 0;
@@ -21,38 +22,30 @@ function rock(params) {
 rock.prototype.update = function(objects) {
 
     for (var j = 0; j < objects.length; j++) {
-        if (objects[j].name == 'ship') {
-            var ship = objects[j];
-            // Ship hits management
-            if (((ship.posX >= this.posX && ship.posX <= (this.posX + this.width)) ||
-                    (ship.posX + ship.width >= this.posX && ship.posX.width <= (this.posX + this.width))) &&
-                    ship.posY >= this.posY && ship.posY <= this.posY + this.height && ship.state == 0) {
-                ship.state = 2;
-                var explosion = new Audio("./sounds/bigboom.wav");
-                explosion.play();
-            }
-
-            // Shoot hits management
-            if (this.state == 0) {
-                for (var i = 0; i < ship.shoots.length; i++) {
-                    if (ship.shoots[i][0] >= this.posX &&
-                            ship.shoots[i][0] <= (this.posX + this.width) &&
-                            ship.shoots[i][1] >= this.posY &&
-                            ship.shoots[i][1] <= this.posY + this.height
-                            ) {
-                        ship.clearShoot(ship.shoots[i][0], ship.shoots[i][1]);
-                        ship.shoots.splice(i, 1);
-                        this.state = 1;
-                        this.clock = 0;
-                        this.img = 'rock-explosion';
-                        var explosion = new Audio("./sounds/explosion.wav");
-                        explosion.play();
-                        addPoints();
-                    }
-
+        switch (objects[j].name) {
+            case 'ship':
+                var ship = objects[j];
+                if (((ship.posX >= this.posX && ship.posX <= (this.posX + this.width)) ||
+                        (ship.posX + ship.width >= this.posX && ship.posX.width <= (this.posX + this.width))) &&
+                        ship.posY >= this.posY && ship.posY <= this.posY + this.height && ship.state == 0) {
+                    ship.state = 2;
                 }
-            }
+                break;
+            case 'shoot':
+                var shoot = objects[j];
+                if (shoot.posX >= this.posX &&
+                        shoot.posX <= (this.posX + this.width) &&
+                        shoot.posY >= this.posY &&
+                        shoot.posY <= this.posY + this.height
+                        ) {
+                    this.player = shoot.player;
+                    this.state = 1;
+                    this.clock = 0;
+                    this.img = 'rock-explosion';
+                }
+                break;
         }
+
     }
 
 

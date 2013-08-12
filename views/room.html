@@ -37,31 +37,19 @@
                 <div class="span10">
                     <!-- center side panel -->
                     <div style="margin: auto; width: 708px; height: 570px; position: relative;" class="well well-large">
-                        <span class="roomTitle" id="roomTitle"></span>
                         <div id="space" class="stage"></div>
                         <canvas id="canvas-layer" width="708" height="570" >Your browser does not support html5.</canvas>
                         <div id="loading-layer">
                             <span style="position: absolute; top: 250px; color: white; width: 708; left: 0;">Loading...</span>
                             <div id="progress-bar" style="left: 100px; top: 300px; position: absolute; width: 70%; z-index: 8;"></div>
                         </div>
-
                         <div id="connecting-layer">
                             <div style="margin: 190px auto auto auto;text-align: center;width: 220px;">
                                 <input type="text" placeholder="What's your name?" name="player" id="player">
-                                <button id="connectBtn" type="button" class="btn btn-primary btn-large btn-block" onclick="connect()"><i class="icon-globe icon-white"></i> join room</button>
+                                <button id="connectBtn" type="button" class="btn btn-primary btn-large btn-block" onclick="joinGame()"><i class="icon-globe icon-white"></i> join room</button>
                             </div>
                             <div id="connectingText" style="text-align: center;color: white;display: none;">Connecting...</div>
                             <div id="connectingLoader" style="text-align: center;color: white;display: none;"><img src="images/ajax-loader.gif"></div>
-                        </div>
-
-                        <div id="server-layer">
-                            <h2>Rooms</h2>
-                            <div id="rooms" class="row-fluid"></div>
-                            <hr>
-                            <center>
-                                <input type="text" class="input-append" placeholder="Room name" name="new room" id="new-room">
-                                <button type="button" class="btn btn-primary" onclick="newRoom()"><i class="icon-plus icon-white"></i> New room</button>
-                            </center>
                         </div>
                     </div>
                 </div>
@@ -72,15 +60,7 @@
                             <button class="btn btn-large btn-block" type="button" onclick="pauseGame();" title="pause"><i class="icon-pause"></i></button>
                         </div>
                         <div class="well well-small">
-                            <table class="table table-condensed">
-                                <thead>
-                                    <tr>
-                                        <th>player</th>
-                                        <th>points</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="players"></tbody>
-                            </table>
+                            <div id="players"></div>
                         </div>
                     </div>
                 </div>

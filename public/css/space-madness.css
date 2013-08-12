@@ -50,6 +50,16 @@
     left: 24px;
     top: 24px;
 }
+#server-layer{
+    background-color: black;
+    width: 708px;
+    height: 570px;
+    position: absolute;
+    z-index:6;
+    left: 24px;
+    top: 24px;
+    display: none;
+}
 #player{
 }
 #connectBtn{
@@ -57,8 +67,41 @@
 #connectingText{
     margin-top: 20px;
 }
+/* server */
 #serverControl{
     display: none;
+}
+.room{
+    width: 100px;
+    height: 100px;
+    margin: 5px;
+}
+.room .roomname{
+
+}
+.roomTitle{
+    -webkit-transform: rotate(270deg);
+    -moz-transform: rotate(270deg);
+    -o-transform: rotate(270deg);
+    font-size: 42px;
+    top: 179px;
+    left: -96px;
+    color: whitesmoke;
+    position: absolute;
+    text-transform: uppercase;
+    display: none;
+}
+.message{
+    color: white;
+    position: absolute;
+    left: 45%;
+    top: 50%;
+    z-index: 50;
+    display: none;
+    font-size: 48px;
+    text-transform: uppercase;
+    color: white;
+    text-shadow: 0px 0px 5px white;
 }
 
 .header-layer{

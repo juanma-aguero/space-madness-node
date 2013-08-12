@@ -1,6 +1,7 @@
 /** Rect*/
 function rock(params) {
     this.name = 'rock';
+    this.player = undefined;
     this.vel = params.vel;
     this.posX = params.posX;
     this.spriteX = 0;
@@ -25,7 +26,6 @@ rock.prototype.update = function(objects) {
         var currentObj = objects[j];
         switch (currentObj.name) {
             case 'ship':
-                var ship = objects[j];
                 // Ship hits management
                 if (((currentObj.posX >= this.posX && currentObj.posX <= (this.posX + this.width)) ||
                         (currentObj.posX + currentObj.width >= this.posX && currentObj.posX.width <= (this.posX + this.width))) &&
@@ -40,6 +40,8 @@ rock.prototype.update = function(objects) {
                         currentObj.posY >= this.posY &&
                         currentObj.posY <= this.posY + this.height
                         ) {
+                    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> shoot player: " + currentObj.player);
+                    this.player = currentObj.player;
                     objects.splice(j, 1);
                     this.state = 1;
                     this.clock = 0;

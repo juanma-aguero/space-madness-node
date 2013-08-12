@@ -1,65 +1,86 @@
 var game = undefined;
 var socketIOReady = $.Deferred();
-var socket = undefined;
+var socket = io.connect();
 var percentage = 5;
 imageBuffer = new Array();
 context = {width: 708, height: 570};
 soundBuffer = new Array();
 
+
+socket.on('connect', function() {
+    username = $("#player").val();
+    if (!username.length > 0) {
+        username = "player" + parseInt((2 + (Math.random() * (9 - 2))));
+    }
+    socket.emit('joinServer', {username: username});
+});
+
+socket.on('joined', function(data) {
+    for (var i = 0; i < data.rooms.length; i++) {
+        var roomHtml = "<div class='room well pull-left'>";
+        roomHtml += "<h4>" + data.rooms[i].name + "</h4>";
+        roomHtml += "<small>Players count: " + data.rooms[i].players + "</small>";
+        roomHtml += "<div><button class='btn btn-block' onclick='joinRoom(\"" + data.rooms[i].name + "\")'>Join</button></div>";
+        roomHtml += "</div>";
+        $("#rooms").append(roomHtml);
+    }
+    $("#connecting-layer").hide();
+    $("#server-layer").fadeIn();
+});
+
+socket.on('clientOnline', function(data) {
+    updatePlayers(data.players);
+});
+
+socket.on('clientOffline', function(data) {
+    updatePlayers(data.players);
+});
+
+socket.on('runGame', function(data) {
+    console.log("start game");
+    startGame();
+});
+socket.on('stopGame', function(data) {
+    console.log("stop game");
+    stopGame();
+});
+
+socket.on('updateObjects', function(data) {
+    updatePlayers(data.players);
+    game.objects = data.objects;
+    game.correctObjects();
+});
+
+socket.on('initWorld', function(data) {
+    initWorld(data);
+    $('#connecting-layer').fadeOut('fast');
+    $('#serverControl').show();
+});
+function newRoom() {
+    var roomName = $("#new-room").val();
+    $('#server-layer').hide();
+    joinRoom(roomName);
+}
 function updatePlayers(players) {
     $('#players').empty();
     for (var i = 0; i < players.length; i++) {
-        $('#players').append("<div><span>" + players[i].username + "</span>:<span>" + players[i].points + "</span></div>");
+        $('#players').append("<tr><td>" + players[i].player + "</td><td>" + players[i].points + "</td></tr>");
     }
 }
 
-
-
-function joinGame() {
+function joinRoom(roomName) {
     game = new clientNgn({prediction: false});
-    $("#connectBtn").hide();
-    $("#connectingText").show();
-    $("#connectingLoader").show();
-    socket = io.connect();
+    $('#server-layer').hide();
+    $('body').append("<span class='message'>" + roomName + "<span>");
+    $(".message").fadeIn('slow');
+    setTimeout(function() {
+        $(".message").hide("drop", {direction: 'left'}, "slow", function() {
+            $("#roomTitle").text(roomName);
+            $("#roomTitle").fadeIn('slow');
+        });
+    }, 1500);
     game.setup(socket);
-
-    socket.on('connect', function() {
-        username = $("#player").val();
-        if (!username.length > 0) {
-            username = "player" + parseInt((2 + (Math.random() * (9 - 2))));
-        }
-        socket.emit('joinGame', {roomName: "galaga", username: username});
-    });
-
-    socket.on('clientOnline', function(data) {
-        updatePlayers(data.players);
-    });
-
-    socket.on('clientOffline', function(data) {
-        updatePlayers(data.players);
-    });
-
-    socket.on('runGame', function(data) {
-        console.log("start game");
-        startGame();
-    });
-    socket.on('stopGame', function(data) {
-        console.log("stop game");
-        stopGame();
-    });
-
-    socket.on('updateObjects', function(data) {
-        game.objects = data.objects;
-        game.correctObjects();
-    });
-
-    socket.on('initWorld', function(data) {
-        initWorld(data);
-        $('#connecting-layer').fadeOut('fast');
-        $('#serverControl').show();
-    });
-
-
+    socket.emit('joinGame', {roomName: roomName, player: username});
 }
 
 function initWorld(data) {
@@ -178,13 +199,12 @@ $(document).ready(function() {
     preloader();
 
     $("#player").keypress(function(e) {
-        if (e.keyCode == 13) {
+        if (e.keyCode === 13) {
             $("#connectBtn").click();
         }
     });
 
     $.when(socketIOReady).done(function() {
-        console.log("socket ready");
         $('#connecting-layer').hide();
         $('#connectBtn').show();
     });

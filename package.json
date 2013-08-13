@@ -1,7 +1,7 @@
 {
     "name": "SpaceMadness",
     "author": "JuanMa Aguero",
-    "version": "0.0.6-3",
+    "version": "0.0.6-4",
     "description": "HTML5 space game",
     "node": "v0.8.x",
     "dependencies": {
